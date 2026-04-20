@@ -3,15 +3,30 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --color-background: #FAF7F2;
+  --color-surface: #FFFFFF;
+  --color-muted: #F3EEE4;
+  --color-ink: #1A1815;
+  --color-ink-soft: #5C5852;
+  --color-line: #E8E2D8;
+  --color-accent: var(--color-brand-light); 
+  --color-accent-hover: var(--color-brand-dark);
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-muted: var(--color-muted);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-line: var(--color-line);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Neutral palette */
   --color-gray-50: #f9fafb;
   --color-gray-100: #f3f4f6;
   --color-gray-200: #e5e7eb;
@@ -23,21 +38,17 @@
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
 
-  /* Brand blue */
   --color-brand: #0F3D91;
   --color-brand-light: #1a52c4;
   --color-brand-dark: #0a2d6e;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html, body { background: var(--color-background); color: var(--color-ink); }
+body { font-family: var(--font-geist-sans); font-feature-settings: "ss01", "cv11"; }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+button:not(:disabled), [role="button"]:not(:disabled), summary { cursor: pointer; }
+
+.font-display { font-family: var(--font-geist-sans); letter-spacing: -0.02em; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }

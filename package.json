@@ -9,7 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/gateway": "^3.0.104",
     "@prisma/client": "^7.7.0",
+    "ai": "^6.0.168",
     "next": "16.2.4",
     "prisma": "^7.7.0",
     "react": "19.2.4",
