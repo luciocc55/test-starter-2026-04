@@ -7,7 +7,358 @@ datasource db {
   provider = "sqlite"
 }
 
-model StarterPlaceholder {
-  id        Int      @id @default(autoincrement())
+// ─── Users ──────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
   createdAt DateTime @default(now())
+
+  imports    ImportBatch[]
+  properties Property[]
+  tenants    Tenant[]
+  units      Unit[]
+  leases     Lease[]
+  charges    Charge[]
+  payments   Payment[]
+  workOrders WorkOrder[]
+}
+
+// ─── Business (permanent) ───────────────────────────────────────────
+
+model Property {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  name           String
+  normalizedName String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  units Unit[]
+
+  @@unique([userId, normalizedName])
+  @@index([userId])
+}
+
+model Tenant {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  firstName    String
+  lastName     String
+  email        String?
+  phone        String?
+  dateOfBirth  DateTime?
+  status       String
+  notes        String?
+  importStatus String?
+  importFlags  String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  externalRefs TenantExternalRef[]
+  leases       Lease[]
+
+  @@unique([userId, email])
+  @@index([userId])
+  @@index([userId, lastName])
+}
+
+model TenantExternalRef {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  sourceSystem  String
+  externalId    String
+  importBatchId String?
+  createdAt     DateTime @default(now())
+
+  @@unique([sourceSystem, externalId])
+  @@index([tenantId])
+}
+
+model Unit {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id])
+  propertyId        String
+  property          Property  @relation(fields: [propertyId], references: [id])
+  unitNumber        String
+  bedrooms          Int?
+  bathrooms         Float?
+  squareFeet        Int?
+  monthlyRentTarget Decimal?
+  status            String
+  importStatus      String?
+  importFlags       String?
+  externalId        String?
+  sourceSystem      String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  leases     Lease[]
+  workOrders WorkOrder[]
+
+  @@unique([sourceSystem, externalId, userId])
+  @@index([userId])
+  @@index([userId, propertyId])
+}
+
+model Lease {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  tenantId        String?
+  tenant          Tenant?   @relation(fields: [tenantId], references: [id])
+  unitId          String?
+  unit            Unit?     @relation(fields: [unitId], references: [id])
+  startDate       DateTime
+  endDate         DateTime
+  monthlyRent     Decimal
+  securityDeposit Decimal
+  status          String
+  importStatus    String?
+  importFlags     String?
+  externalId      String?
+  sourceSystem    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  charges  Charge[]
+  payments Payment[]
+
+  @@unique([sourceSystem, externalId, userId])
+  @@index([userId, unitId])
+  @@index([userId, tenantId])
+  @@index([userId, status])
+}
+
+model Charge {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  leaseId      String?
+  lease        Lease?   @relation(fields: [leaseId], references: [id])
+  chargeDate   DateTime
+  amount       Decimal
+  type         String
+  description  String
+  accountRef   String?
+  importStatus String?
+  importFlags  String?
+  externalId   String?
+  sourceSystem String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([sourceSystem, externalId, userId])
+  @@index([userId, leaseId])
+  @@index([userId, chargeDate])
+}
+
+model Payment {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id])
+  leaseId             String?
+  lease               Lease?   @relation(fields: [leaseId], references: [id])
+  paymentDate         DateTime
+  amount              Decimal
+  method              String
+  notes               String?
+  splitPaymentGroupId String?
+  accountRef          String?
+  importStatus        String?
+  importFlags         String?
+  externalId          String?
+  sourceSystem        String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@unique([sourceSystem, externalId, userId])
+  @@index([userId, leaseId])
+  @@index([userId, paymentDate])
+  @@index([userId, splitPaymentGroupId])
+}
+
+model WorkOrder {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  unitId       String?
+  unit         Unit?     @relation(fields: [unitId], references: [id])
+  openedDate   DateTime
+  closedDate   DateTime?
+  status       String
+  category     String
+  description  String
+  vendorName   String
+  cost         Decimal
+  importStatus String?
+  importFlags  String?
+  externalId   String?
+  sourceSystem String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([sourceSystem, externalId, userId])
+  @@index([userId, status])
+  @@index([userId, unitId])
+}
+
+// ─── Import artifacts (TTL 60 days) ─────────────────────────────────
+
+model ImportBatch {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  sourceSystem String
+  fileName     String
+  fileHash     String
+  fileBytes    Bytes?
+  status       String
+  errorMessage String?
+  uploadedAt   DateTime  @default(now())
+  parsedAt     DateTime?
+  committedAt  DateTime?
+  expiresAt    DateTime
+  counts        String?
+  fuzzyClusters String?
+
+  stagedTenants    StagedTenant[]
+  stagedUnits      StagedUnit[]
+  stagedLeases     StagedLease[]
+  stagedCharges    StagedCharge[]
+  stagedPayments   StagedPayment[]
+  stagedWorkOrders StagedWorkOrder[]
+
+  @@unique([userId, fileHash])
+  @@index([expiresAt])
+  @@index([userId, status])
+}
+
+model StagedTenant {
+  id               String      @id @default(cuid())
+  importBatchId    String
+  importBatch      ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+  rowNumber        Int
+  externalId       String
+  firstName        String
+  lastName         String
+  email            String
+  phone            String
+  dateOfBirth      String
+  parsedDob        DateTime?
+  status           String
+  notes            String
+  issues           String
+  resolvedTenantId String?
+
+  @@index([importBatchId])
+}
+
+model StagedUnit {
+  id                      String      @id @default(cuid())
+  importBatchId           String
+  importBatch             ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+  rowNumber               Int
+  externalId              String
+  propertyName            String
+  normalizedPropertyName  String
+  unitNumber              String
+  bedrooms                String
+  bathrooms               String
+  squareFeet              String
+  monthlyRentTarget       String
+  status                  String
+  issues                  String
+  resolvedUnitId          String?
+  resolvedPropertyId      String?
+
+  @@index([importBatchId])
+  @@index([importBatchId, normalizedPropertyName])
+}
+
+model StagedLease {
+  id               String      @id @default(cuid())
+  importBatchId    String
+  importBatch      ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+  rowNumber        Int
+  externalId       String
+  tenantExternalId String
+  unitExternalId   String
+  startDate        String
+  endDate          String
+  parsedStart      DateTime?
+  parsedEnd        DateTime?
+  monthlyRent      String
+  securityDeposit  String
+  status           String
+  issues           String
+  resolvedLeaseId  String?
+
+  @@index([importBatchId])
+}
+
+model StagedCharge {
+  id               String      @id @default(cuid())
+  importBatchId    String
+  importBatch      ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+  rowNumber        Int
+  externalId       String
+  leaseExternalId  String
+  chargeDate       String
+  parsedDate       DateTime?
+  amount           String
+  parsedAmount     Decimal?
+  type             String
+  description      String
+  issues           String
+  resolvedChargeId String?
+
+  @@index([importBatchId])
+}
+
+model StagedPayment {
+  id                String      @id @default(cuid())
+  importBatchId     String
+  importBatch       ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+  rowNumber         Int
+  externalId        String
+  leaseExternalId   String
+  paymentDate       String
+  parsedDate        DateTime?
+  amount            String
+  parsedAmount      Decimal?
+  method            String
+  notes             String
+  issues            String
+  resolvedPaymentId String?
+
+  @@index([importBatchId])
+}
+
+model StagedWorkOrder {
+  id                  String      @id @default(cuid())
+  importBatchId       String
+  importBatch         ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+  rowNumber           Int
+  externalId          String
+  unitExternalId      String
+  openedDate          String
+  closedDate          String
+  parsedOpened        DateTime?
+  parsedClosed        DateTime?
+  status              String
+  category            String
+  description         String
+  vendorName          String
+  cost                String
+  parsedCost          Decimal?
+  issues              String
+  resolvedWorkOrderId String?
+
+  @@index([importBatchId])
 }
