@@ -6,7 +6,7 @@ export default function Home() {
           RDE Advisors Engineering Test
         </h1>
         <p className="text-gray-600">
-          Build Part 1 here. See <code className="bg-gray-100 px-1 rounded">README.md</code> for the full spec.
+          Build Part 1 here. See <code className="bg-gray-100 px-1 rounded">TEST_SPEC.md</code> for the full spec.
         </p>
       </div>
     </main>
