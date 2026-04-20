@@ -40,7 +40,12 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). The homepage placeholder tells you where to start.
 
-> **Stack note:** this starter uses **Next.js 16, React 19, Prisma 7, and Tailwind 4**. Some APIs differ from earlier major versions (e.g. Prisma's generated client now lives at `src/generated/prisma`, not `@prisma/client`). If something behaves differently than you expect, check `node_modules/next/dist/docs/` or the Prisma v7 docs.
+> **Stack note:** this starter uses **Next.js 16, React 19, Prisma 7, and Tailwind 4**. Some APIs differ from earlier major versions — notably:
+>
+> - **Prisma's generated client** now lives at `src/generated/prisma` (not `@prisma/client`). Import from `src/generated/prisma`.
+> - **`DATABASE_URL` is read from `prisma.config.ts`, not from `schema.prisma`.** Do NOT add `url = env("DATABASE_URL")` to `schema.prisma` — Prisma 7 will error with a duplicate-datasource-url message. The `url` lives exclusively in `prisma.config.ts`, which reads `process.env.DATABASE_URL` from your `.env` file.
+>
+> If something behaves differently than you expect, consult the [Next.js 16 docs](https://nextjs.org/docs) or the [Prisma v7 docs](https://www.prisma.io/docs).
 
 > **Note:** A `dev.db` SQLite file will be created locally when you run migrations. It is gitignored — do not commit it.
 
@@ -50,13 +55,15 @@ Open [http://localhost:3000](http://localhost:3000). The homepage placeholder te
 
 See [`TEST_SPEC.md`](./TEST_SPEC.md) for full detail.
 
-| Part | What | Time |
+| Part | What | Suggested time |
 |------|------|------|
 | 1 | BTS chat-first search at `/`, `/search`, `/listings/[slug]` | 55 min |
 | 2 | PM Buildium import at `/import` | 45 min |
 | 3 | PM dashboard at `/dashboard` with rent roll / AR aging / expense chart / NL query | 55 min |
 | 4 | Written answers W1–W5 in `SUBMISSION.md` | 40 min |
 | 5 | Loom walkthrough | 10 min |
+
+Times are **suggestions** — 205 min of active work inside the 3.5-hour (210 min) clock leaves ~5 min of slack. How you allocate is part of what we grade. See the "Clock & process rules" section in `TEST_SPEC.md` for hard rules (commit cadence, AI tool policy, etc.).
 
 ---
 
@@ -68,14 +75,21 @@ See [`TEST_SPEC.md`](./TEST_SPEC.md) for full detail.
    - All five written answers (W1–W5)
    - A 200-word plain-English architecture overview written for a non-technical founder
    - A one-page cost projection table
+   - A **Decisions & Tradeoffs** section with 5+ specific choices tied to files (see `TEST_SPEC.md` for detail)
 4. **`README.md`** updated with "how to run this locally" for your specific implementation.
-5. **Loom walkthrough** (5–10 min) including a 60-second "explain this to a non-technical founder" segment.
+5. **Loom walkthrough** (5–10 min) including:
+   - A 60-second "explain this to a non-technical founder" segment
+   - A 2-minute walkthrough of 3 specific code decisions (what / rejected alternatives / why)
+   - AI tool disclosure
 
 ---
 
 ## Rules
 
+See `TEST_SPEC.md` → "Clock & process rules" for the authoritative list. Short version:
+
 - **3.5-hour hard wall-clock.** Git commit timestamps are audited; do not rebase after the clock starts.
+- **Commit at least every 30 minutes** with meaningful messages.
 - **AI tools allowed** — disclose which ones in your Loom.
 - **No subcontracting.** The code must be yours.
 - **RDE claims no IP.** Everything you write belongs to you.
