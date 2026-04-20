@@ -1,4 +1,3 @@
-import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import type { Metadata } from "next";
 
@@ -15,6 +14,9 @@ export default function PmLayout({ children }: { children: React.ReactNode }) {
           <Link href="/import" className="font-display text-lg text-[color:var(--color-ink)]">
             PM Platform
           </Link>
+          <Link href="/dashboard" className="text-sm text-[color:var(--color-ink-soft)] hover:text-[color:var(--color-ink)]">
+            Dashboard
+          </Link>
           <Link href="/import" className="text-sm text-[color:var(--color-ink-soft)] hover:text-[color:var(--color-ink)]">
             Import
           </Link>
@@ -28,7 +30,6 @@ export default function PmLayout({ children }: { children: React.ReactNode }) {
             Flagged
           </Link>
         </nav>
-        <UserButton />
       </header>
       <main className="flex-1">{children}</main>
     </div>
