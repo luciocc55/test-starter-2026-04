@@ -37,6 +37,20 @@ A partial submission that shows judgment is better than a rushed, broken full su
 
 ---
 
+## Clock & process rules
+
+Read these before you start. They're how we evaluate that the work is yours and done in the window.
+
+- **3.5-hour hard wall-clock.** Git commit timestamps will be audited. Don't rebase after the clock starts.
+- **Commit at least every 30 minutes** with meaningful commit messages (e.g., `feat: search page renders ai bubble + cards`, not `wip`). Organic commit progression is part of how we evaluate the work — a single 500-line dump at the end is a red flag.
+- **AI tools, documentation, Stack Overflow, Claude, ChatGPT, Cursor, Copilot — all explicitly allowed.** Use whatever you normally use. Disclose which ones in your Loom.
+- **No subcontracting. No human pair-programming.** The code must be yours.
+- **Partial submissions are fine** — submit what you have by the deadline even if incomplete. $100 paid on any submission regardless of outcome.
+- **Setup blocker in the first 10 minutes?** (Prisma migration, clone auth, anything weird.) Email Ross immediately — we'll pause the clock.
+- **RDE claims no IP.** Everything you write belongs to you.
+
+---
+
 ### Part 1 — BTS chat-first search (~55 min)
 
 Use `/data/listings.json` (25 synthetic NYC office listings) + `/public/images/listings/` + `/public/floorplans/`.
@@ -119,10 +133,13 @@ Name the **three biggest cost traps you've personally seen engineers fall into w
 ### Part 5 — Loom walkthrough (~10 min)
 
 Record a Loom where you:
+
 1. Open your live deploy and click through what you built.
 2. Explain 2–3 specific trade-offs you made (what you cut, what you kept, why).
 3. Tell us what you'd build next if this were week 1 on the job.
 4. **"Explain this to a non-technical founder" segment (mandatory, ~60 seconds).** Ross is non-technical. In language anyone would understand — no jargon, no acronyms — explain what you built and why it matters for his business. This segment is graded separately and is required.
+5. **Code decisions walkthrough (mandatory, ~2 minutes).** Pick 3 specific code decisions in your repo and walk through each one on screen. For each: *what* you chose, *what alternatives you rejected*, and *why*. Examples of decision-level choices: "how I structured the Prisma schema to support lease history," "how the `/search` page degrades when the LLM mis-parses," "how the import preview surfaces orphan records." This segment proves the code is yours.
+6. **AI tool disclosure (mandatory, 10–20 seconds).** State which AI tools you used (Claude, ChatGPT, Cursor, Copilot, etc.) and roughly how — e.g., "Cursor for scaffolding, Claude for the NL query prompt design."
 
 Do not narrate your entire codebase. We want your judgment on camera, not a tour.
 
@@ -137,6 +154,7 @@ Beyond the 5 written answers:
 - **Phase-2 paragraph** (part of Part 2) on how your schema evolves to own the books.
 - **Edge cases paragraph** (part of Part 2) documenting the 2+ edge cases you surfaced.
 - **NL query guardrail paragraph** (part of Part 3) on how you prevented destructive queries.
+- **Decisions & Tradeoffs section** — at least **5 specific choices** you made, each tied to a specific file/function in your repo. For each: what you chose, what you rejected, and why. Generic bullets ("I used TypeScript for type safety") don't count — we want decisions specific to *this* build ("I modeled `Lease` with a separate `LeaseHistory` table instead of versioning rows in place because phase-2 GL needs clean point-in-time rent roll queries — see `prisma/schema.prisma:42`"). This section is scored.
 
 ---
 
@@ -149,6 +167,7 @@ Beyond the 5 written answers:
 - Writing — `SUBMISSION.md`, README, and Loom narration
 - Seeing the non-obvious problem (the watermark legal question, the phase-2 trust-accounting question, the specific cost traps)
 - Communication with a non-technical founder (the mandatory Loom segment + the 200-word architecture overview)
+- **Ownership signals** — organic commit cadence, specific Decisions & Tradeoffs, a Loom where you can explain *why* you made specific choices
 
 We care less about:
 - Test coverage (don't spend time here)
