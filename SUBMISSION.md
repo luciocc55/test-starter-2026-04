@@ -103,3 +103,9 @@ One-page monthly cost projection for BTS at 10K / 50K / 100K searches, based on 
 - **Cut levers if we need $30/mo at 10K scale:** downgrade Pro → Hobby (-$20, loses team features), skip Analytics (-$10), enable prompt caching (-$3). Gets us to ~$15/mo all-in.
 
 **Headline:** at 100K monthly searches, BTS runs at roughly **$0.0014 per search** — the marginal cost of one AI-powered office search is well under half a penny.
+
+### Decisions & Tradeoffs section
+
+I used vercel AI instead of raw Claude API, this seems easier and we have built in logs and cost tracking. If we scale this up we could think about doing it natively but for now vercel seems like the winner.
+Haiku vs other models
+CSV files can only be up to 20 mb i think this is fine for now, we should use Vercel queues when trying to support bigger files.
